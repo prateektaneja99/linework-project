@@ -5,6 +5,7 @@ import "@/app/globals.css";
 // import Modal from "react-modal";
 import DatePicker from "react-datepicker";
 
+
 import "react-datepicker/dist/react-datepicker.css";
 
 interface Store {
@@ -41,12 +42,20 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
     setEndDate(date);
   };
 
+  const dateConverter = (date : Date)=>{
+    const newDate = new Date(date);
+    const formatedDate = newDate.toISOString().slice(0, 19).replace('T', ' ');
+    return formatedDate;
+  }
+
   const handleConfirm = () => {
     if (startDate && endDate) {
       const updatedStore = { ...rowData.store, storeStatus: "Invisible" as "Invisible" };
       const updatedRowData = { store: updatedStore };
-      console.log("Start Date:", startDate);
-      console.log("End Date:", endDate);
+      const formatedStart = dateConverter(startDate);
+      const formatedEnd = dateConverter(endDate);
+      console.log("Start Date:", formatedStart);
+      console.log("End Date:", formatedEnd);
 
       // You can now use the `startDate` and `endDate` in your API call
       // Make your API call here and handle the response
