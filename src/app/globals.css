@@ -143,6 +143,7 @@
 .dropdown {
   position: relative;
   display: inline-block;
+  padding-bottom: 10px;
 }
 
 /* Style for the dropdown content */
@@ -154,6 +155,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1;
   border-radius: 10px; /* Add rounded corners */
+  font-family: sans-serif;
+  font-size: medium;
+  padding: 5px;
+}
+
+.dropdown-content a {
+  margin: 3px;
 }
 
 .dropdown:hover .dropdown-content {
@@ -176,6 +184,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  /* //width: calc(100% - 64px); */
   z-index: 999; /* Ensures it's above the rest of the content */
 }
 
@@ -186,8 +195,37 @@
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000; /* Ensures it's above the overlay */
+  font-weight: bold;
+  line-height: 32px;
+  text-align: center;
+  font-family: poppins, sans-serif;
 }
 
+.modal-dates {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: space-around;
+}
+
+.confirm-btn {
+  background: linear-gradient(
+    0deg,
+    rgb(236, 72, 61) 0%,
+    rgb(215, 45, 42) 48.3%,
+    rgb(186, 38, 63) 100%
+  );
+  color: white;
+  border: none;
+}
+.cancel-btn {
+  background: transparent;
+  color: black;
+  border: 1px solid black;
+}
 /* Style for the modal title */
 .modal-dialog h2 {
   font-size: 20px;
@@ -207,15 +245,16 @@
 .modal-dialog button {
   padding: 10px 20px;
   margin-right: 10px;
-  border: none;
-  background-color: #007bff; /* Example color, customize as needed */
-  color: white;
   border-radius: 4px;
   cursor: pointer;
+  font-family: "Open Sans", sans-serif, Arial, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
+  padding: 8px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
 }
 
 /* Style for the cancel button */
-.modal-dialog button:last-child {
-  background-color: #ccc; /* Example color, customize as needed */
-}
 

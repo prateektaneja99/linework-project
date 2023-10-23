@@ -1,6 +1,9 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import "../app/globals.css"
+import "../app/globals.css";
+
 interface Product {
   id: number;
   name: string;
@@ -8,13 +11,32 @@ interface Product {
   seller: string;
 }
 
-
 export default function Page() {
-  const products: Product[] = [
-    { id: 1, name: "Prod 1", price: 40, seller: "seller A" },
-    { id: 2, name: "Prod 2", price: 20, seller: "seller B" },
-    { id: 3, name: "Prod 3", price: 30, seller: "seller C" },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    console.log("Inside UseEffect");
+    fetch("http://localhost:8080/products/Active")
+      .then((response) => response.json())
+      .then((data) => {
+        // Extract relevant fields from the API response
+        console.log(data);
+        const relevantProducts = data.map((product: any) => {
+          return {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            seller: product.store_name,
+          };
+        });
+
+        // Set the products state with the relevant data
+        setProducts(relevantProducts);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
+  }, []);
 
   return (
     <>
@@ -35,4 +57,3 @@ export default function Page() {
     </>
   );
 }
-

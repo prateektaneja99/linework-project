@@ -1,10 +1,7 @@
 "use client";
 import { SetStateAction, useState } from "react";
 import "@/app/globals.css";
-
-// import Modal from "react-modal";
 import DatePicker from "react-datepicker";
-
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -17,7 +14,7 @@ interface Store {
 
 interface StoreRowProps {
   store: Store;
-  refetchData: (data : number)=>void;
+  refetchData: (data: number) => void;
 }
 
 const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
@@ -42,16 +39,14 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
     setEndDate(date);
   };
 
-  const dateConverter = (date : Date)=>{
+  const dateConverter = (date: Date) => {
     const newDate = new Date(date);
-    const formatedDate = newDate.toISOString().slice(0, 19).replace('T', ' ');
+    const formatedDate = newDate.toISOString().slice(0, 19).replace("T", " ");
     return formatedDate;
-  }
+  };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (startDate && endDate) {
-      const updatedStore = { ...rowData.store, storeStatus: "Invisible" as "Invisible" };
-      const updatedRowData = { store: updatedStore };
       const formatedStart = dateConverter(startDate);
       const formatedEnd = dateConverter(endDate);
       console.log("Start Date:", formatedStart);
@@ -60,7 +55,52 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
       // You can now use the `startDate` and `endDate` in your API call
       // Make your API call here and handle the response
       // ...
-      setRowData(updatedRowData);
+      const payLoadData = {
+        status: rowData.store.storeStatus,
+        start_date: formatedStart,
+        end_date: formatedEnd,
+        id: rowData.store.storeID,
+      };
+
+      fetch(`http://localhost:8080/store/${rowData.store.storeID}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Set the content type if sending JSON
+          // Add any other headers if needed
+        },
+        body: JSON.stringify(payLoadData), // Serialize the data as JSON
+      })
+        .then(
+          (res) => res.json()
+          // if (res.status === 200) {
+
+          //   // const data = res.json();
+          //   // console.log(data);
+
+          //   const updatedStore = {
+          //     ...rowData.store,
+          //     storeStatus: "Invisible" as "Invisible",
+          //   };
+          //   const updatedRowData = { store: updatedStore };
+          //   setRowData(updatedRowData);
+
+          // } else {
+          //   throw new Error("Failed to fetch data");
+          // }
+        )
+        .then((data) => {
+          //console.log(data);
+          const updatedStore = {
+            ...rowData.store,
+            storeStatus: data.status,
+          };
+          const updatedRowData = { store: updatedStore };
+          setRowData(updatedRowData);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+
       // Close the modal
       closeModal();
     } else {
@@ -68,27 +108,67 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
     }
   };
 
-  const handleStatus = () => {
-    // Create a copy of the state object
-    const updatedStore = { ...rowData.store };
+  const handleStatus = async () => {
+    const payLoadData = {
+      status: rowData.store.storeStatus == "Active" ? "Draft" : "Active",
+    };
+    fetch(`http://localhost:8080/store/${rowData.store.storeID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Set the content type if sending JSON
+        // Add any other headers if needed
+      },
+      body: JSON.stringify(payLoadData), // Serialize the data as JSON
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          const updatedStore = { ...rowData.store };
 
-    if (updatedStore.storeStatus !== "Draft") {
-      updatedStore.storeStatus = "Draft";
-    } else {
-      updatedStore.storeStatus = "Active";
-    }
+          if (updatedStore.storeStatus !== "Draft") {
+            updatedStore.storeStatus = "Draft";
+          } else {
+            updatedStore.storeStatus = "Active";
+          }
 
-    const updatedRowData = { ...rowData, store: updatedStore };
+          const updatedRowData = { ...rowData, store: updatedStore };
 
-    setRowData(updatedRowData);
+          setRowData(updatedRowData);
+        } else {
+          throw new Error("Failed to fetch data");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   const handleVisibility = () => {
     if (rowData.store.storeStatus === "Invisible") {
-      // If it's "Invisible," update it to "Active" and skip opening the modal
-      const updatedStore = { ...rowData.store, storeStatus: "Active" as "Active" };
-      const updatedRowData = { store: updatedStore };
-      setRowData(updatedRowData);
+      const payloadActiveData = { status: "Active" };
+      fetch(`http://localhost:8080/store/${rowData.store.storeID}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Set the content type if sending JSON
+          // Add any other headers if needed
+        },
+        body: JSON.stringify(payloadActiveData), // Serialize the data as JSON
+      })
+        .then((res) => {
+          if (res.status === 200) {
+            const updatedStore = { ...rowData.store };
+
+            updatedStore.storeStatus = "Active";
+
+            const updatedRowData = { ...rowData, store: updatedStore };
+
+            setRowData(updatedRowData);
+          } else {
+            throw new Error("Failed to fetch data");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     } else {
       // If the storeStatus is not "Invisible," open the modal
       openModal();
@@ -97,8 +177,10 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
 
   const handleDeleteStore = () => {
     // Perform the API request to delete the store
-    // You'll need to implement the API logic
+
     refetchData(rowData.store.storeID);
+
+    // You'll need to implement the API logic
   };
 
   return (
@@ -140,29 +222,41 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
             {isModalOpen && (
               <div className="modal-overlay">
                 <div className="modal-dialog">
-                  <h2>Visibility Feature</h2>
-                  <p>Description about the feature goes here.</p>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={handleStartDateChange}
-                    placeholderText="Start Date"
-                  />
-                  <DatePicker
-                    selected={endDate}
-                    onChange={handleEndDateChange}
-                    placeholderText="End Date"
-                  />
-                  <button
-                    onClick={handleConfirm}
-                    disabled={!startDate || !endDate}
-                  >
-                    Confirm
-                  </button>
-                  <button onClick={closeModal}>Cancel</button>
+                  <h2>Set as invisible</h2>
+                  <p>
+                    Your store will not be shown in search results during the
+                    pre-set period. You are still responsible for already
+                    confirmed orders.
+                  </p>
+                  <div className="modal-dates">
+                    <DatePicker
+                      selected={startDate}
+                      onChange={handleStartDateChange}
+                      placeholderText="Start Date"
+                    />
+                    <DatePicker
+                      selected={endDate}
+                      onChange={handleEndDateChange}
+                      placeholderText="End Date"
+                    />
+                  </div>
+
+                  <div className="button-wrapper">
+                    <button className="cancel-btn" onClick={closeModal}>
+                      Cancel
+                    </button>
+                    <button
+                      className="confirm-btn"
+                      onClick={handleConfirm}
+                      disabled={!startDate || !endDate}
+                    >
+                      Confirm
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
-            <a onClick={()=>handleDeleteStore()}>Close this store</a>
+            <a onClick={() => handleDeleteStore()}>Close this store</a>
           </div>
         </div>
       </td>
