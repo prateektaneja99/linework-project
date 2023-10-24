@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import "../app/globals.css";
+import { getProducts } from "@/utils/helper";
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   price: number;
@@ -15,31 +16,14 @@ export default function Page() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    console.log("Inside UseEffect");
-    fetch("http://localhost:8080/products/Active")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        const relevantProducts = data.map((product: any) => {
-          return {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            seller: product.store_name,
-          };
-        });
-
-        setProducts(relevantProducts);
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      });
+    getProducts(setProducts); // Call the getProducts function to populate the products state
   }, []);
 
   return (
     <>
       <header className="site-header">
         <h1>Product Listing</h1>
+        {/* Render a link using Next.js's Link component to navigate to the "store" page */}
         <Link href="/store" className="site-link">
           Switch to Seller Mode
         </Link>
@@ -47,6 +31,7 @@ export default function Page() {
 
       <div>
         <ul className="product-list-container">
+          {/* Render a list of ProductCard components for each product in the state */}
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

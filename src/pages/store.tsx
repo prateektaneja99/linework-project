@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import "../app/globals.css";
 import StoreRow from "@/components/StoreRow";
+import { getStores } from "@/utils/helper";
+import { FETCH_API } from "@/utils/constants";
 
 interface Store {
   storeID: number;
@@ -14,36 +16,22 @@ interface Store {
 export default function Store() {
   const [storeData, setStoreData] = useState<Store[]>([]);
   useEffect(() => {
-    fetch("http://localhost:8080/stores")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        const relevantStores = data.map((store: any) => {
-          return {
-            storeID: store.id,
-            storeName: store.name,
-            storeStatus: store.status,
-            productCount: store.product_count,
-          };
-        });
-
-        setStoreData(relevantStores);
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      });
+    getStores(setStoreData); // Call the getStores function to populate the storeData state
   }, []);
 
+  // Function to handle a button click and delete a store
   const handleButtonClick = (storeId: number) => {
     console.log("Button clicked from child component", storeId);
-    fetch(`http://localhost:8080/store/${storeId}`, {
+
+    // Make a DELETE request to the server to delete the store
+    fetch(`${FETCH_API + storeId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
     })
       .then((res) => res.json())
-      .then((data) => setStoreData(data))
+      .then((data) => setStoreData(data)) // Update the store data after deletion
       .catch((error) => {
         console.error("Error:", error);
       });
@@ -53,6 +41,7 @@ export default function Store() {
     <>
       <header className="site-header">
         <h1>Stores Details</h1>
+        {/* Render a link using Next.js's Link component to navigate to the home page */}
         <Link href="/" className="site-link">
           Switch to User Mode
         </Link>
@@ -77,6 +66,7 @@ export default function Store() {
                 refetchData={handleButtonClick}
               />
             ))}
+            {/* Render a list of StoreRow components for each store in the storeData state */}
           </tbody>
         </table>
       </div>

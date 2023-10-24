@@ -11,9 +11,10 @@ export interface Store {
   productCount: number;
 }
 
+// Define a set of props that the StoreRow component expects
 interface StoreRowProps {
   store: Store;
-  refetchData: (data: number) => void;
+  refetchData: (data: number) => void; // A callback function to refetch data when needed
 }
 
 const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
@@ -31,7 +32,7 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
   const handleDeleteStore = () => {
     refetchData(rowData.storeID);
   };
-
+  // Render a table row for a store with its corresponding information and actions
   return (
     <tr className="table-row">
       <td className="table-cell">{rowData.storeID}</td>
@@ -58,6 +59,7 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
         <div className="dropdown">
           <button className="dropbtn">...</button>
           <div className="dropdown-content">
+            {/* Provide an options to change the Store Status */}
             <a onClick={() => handleStatus(rowData, setRowData)}>
               {`Set as ${rowData.storeStatus != "Draft" ? "Draft" : "Active"}`}
             </a>
@@ -65,7 +67,9 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
               {rowData.storeStatus != "Invisible"
                 ? "Temporary Invisible"
                 : "Set as Active"}
-            </a>
+            </a>{" "}
+            {/* Offer an option to change Store Visibility */}
+            {/* The Calendar component handles date-related actions and displays a calendar interface */}
             {isModalOpen && (
               <Calendar
                 closeModal={closeModal}
@@ -73,7 +77,8 @@ const StoreRow: React.FC<StoreRowProps> = ({ store, refetchData }) => {
                 setRowData={setRowData}
               />
             )}
-            <a onClick={() => handleDeleteStore()}>Close this store</a>
+            <a onClick={() => handleDeleteStore()}>Close this store</a>{" "}
+            {/* Allow closing the store */}
           </div>
         </div>
       </td>

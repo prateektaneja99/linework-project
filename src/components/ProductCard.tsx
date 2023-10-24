@@ -7,11 +7,13 @@ interface Product {
   seller: string;
 }
 
+// Define a set of props that the ProductCard component expects
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  // Render the ProductCard component's content
   return (
     <div className="product-card">
       <div className="product-card-content">
