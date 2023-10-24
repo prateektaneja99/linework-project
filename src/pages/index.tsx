@@ -19,7 +19,6 @@ export default function Page() {
     fetch("http://localhost:8080/products/Active")
       .then((response) => response.json())
       .then((data) => {
-        // Extract relevant fields from the API response
         console.log(data);
         const relevantProducts = data.map((product: any) => {
           return {
@@ -30,7 +29,6 @@ export default function Page() {
           };
         });
 
-        // Set the products state with the relevant data
         setProducts(relevantProducts);
       })
       .catch((error) => {
